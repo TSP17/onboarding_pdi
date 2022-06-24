@@ -7,6 +7,7 @@ class Dashboard extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Dashboard'),
+        backgroundColor: Color(0xFF133b3c),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
