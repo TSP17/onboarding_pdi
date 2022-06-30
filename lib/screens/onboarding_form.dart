@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_masked_text/flutter_masked_text.dart';
 import '../http/webclients/onboarding_webclient.dart';
 import '../models/onboarding.dart';
 
@@ -10,9 +10,13 @@ class OnboardingForm extends StatefulWidget {
 
 class _OnboardingFormState extends State<OnboardingForm> {
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _cpfController = TextEditingController();
+  final MaskedTextController _cpfController =
+      MaskedTextController(mask: '000.000.000-00');
+      
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _passwordConfirmController =
+      TextEditingController();
 
   final OnboardingWebClient _webClient = OnboardingWebClient();
 
@@ -78,7 +82,7 @@ class _OnboardingFormState extends State<OnboardingForm> {
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: TextField(
-                controller: _passwordController,
+                controller: _passwordConfirmController,
                 decoration: InputDecoration(
                   labelText: 'Confirme sua senha *',
                 ),
@@ -101,11 +105,25 @@ class _OnboardingFormState extends State<OnboardingForm> {
                     final String? name = _nameController.text;
                     final String? cpf = _cpfController.text;
                     final String? password = _passwordController.text;
+                    final String? confirmPassword =
+                        _passwordConfirmController.text;
+                    final String? email = _emailController.text;
 
-                    final Onboarding onboarding =
-                        Onboarding(name, cpf, password, '');
+                    if (password != confirmPassword) {
+                      _showMyDialog(
+                        'Senhas não conferem.',
+                      );
+                      Navigator.pop(context);
+                    }
+                    final Onboarding onboardingCreated =
+                        Onboarding(name, cpf, password, '', email);
 
-                    _webClient.save(onboarding);
+                    _webClient.save(onboardingCreated).then((onboardingResult) {
+                      _showMyDialog(onboardingResult.status as String);
+                      // if (onboardingResult.status == "Cadastrado com Sucesso") {
+                      //   _showMyDialog();
+                      // }
+                    });
 
                     Navigator.pop(context);
                     //final Contact newContact = Contact(0, name, accountNumber);
@@ -117,6 +135,33 @@ class _OnboardingFormState extends State<OnboardingForm> {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _showMyDialog(String message) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(message),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(message),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
