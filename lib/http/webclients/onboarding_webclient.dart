@@ -9,11 +9,14 @@ import '../interceptors/logging-interceptor.dart';
 final Client client =
     InterceptedClient.build(interceptors: [LoggingInterceptor()]);
 
-const String baseUrl = 'onboarding-acquisition.stg.guideinvestimentos.com.br';
+const String baseUrl = 'onboarding-acquisition.qa.guideinvestimentos.com.br';
 const String baseUrlEndpoint = 'acquisition';
 
 class OnboardingWebClient {
   Future<OnboardingResult> save(Onboarding transaction) async {
+    // transaction.cpf?.replaceAll('.', '');
+    // transaction.cpf = transaction.cpf?.replaceAll('-', '');
+
     final String transactionJson =
         _populateFromJson(transaction.cpf, transaction.name, transaction.email);
 

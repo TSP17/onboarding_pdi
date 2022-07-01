@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_masked_text/flutter_masked_text.dart';
+import 'package:onboarding_pdi/screens/dashboard.dart';
 import '../http/webclients/onboarding_webclient.dart';
 import '../models/onboarding.dart';
 
@@ -12,7 +13,7 @@ class _OnboardingFormState extends State<OnboardingForm> {
   final TextEditingController _nameController = TextEditingController();
   final MaskedTextController _cpfController =
       MaskedTextController(mask: '000.000.000-00');
-      
+
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordConfirmController =
@@ -27,113 +28,122 @@ class _OnboardingFormState extends State<OnboardingForm> {
         title: Text('Abra Sua Conta'),
         backgroundColor: Color(0xFF133b3c),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: <Widget>[
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: 'Nome completo *',
-              ),
-              style: TextStyle(
-                fontSize: 24.0,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: TextField(
-                controller: _cpfController,
-                decoration: InputDecoration(
-                  labelText: 'CPF *',
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: <Widget>[
+                TextField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Nome completo *',
+                  ),
+                  style: TextStyle(
+                    fontSize: 24.0,
+                  ),
                 ),
-                style: TextStyle(
-                  fontSize: 24.0,
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: TextField(
+                    controller: _cpfController,
+                    decoration: InputDecoration(
+                      labelText: 'CPF *',
+                    ),
+                    style: TextStyle(
+                      fontSize: 24.0,
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
                 ),
-                keyboardType: TextInputType.number,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: TextField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  labelText: 'E-mail *',
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: TextField(
+                    controller: _emailController,
+                    decoration: InputDecoration(
+                      labelText: 'E-mail *',
+                    ),
+                    style: TextStyle(
+                      fontSize: 24.0,
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                  ),
                 ),
-                style: TextStyle(
-                  fontSize: 24.0,
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: TextField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    decoration: InputDecoration(
+                      labelText: 'Crie uma senha *',
+                    ),
+                    style: TextStyle(
+                      fontSize: 24.0,
+                    ),
+                    keyboardType: TextInputType.visiblePassword,
+                  ),
                 ),
-                keyboardType: TextInputType.emailAddress,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: TextField(
-                controller: _passwordController,
-                decoration: InputDecoration(
-                  labelText: 'Crie uma senha *',
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: TextField(
+                    controller: _passwordConfirmController,
+                    obscureText: true,
+                    enableSuggestions: false,
+                    autocorrect: false,
+                    decoration: InputDecoration(
+                      labelText: 'Confirme sua senha *',
+                    ),
+                    style: TextStyle(
+                      fontSize: 24.0,
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
                 ),
-                style: TextStyle(
-                  fontSize: 24.0,
-                ),
-                keyboardType: TextInputType.visiblePassword,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: TextField(
-                controller: _passwordConfirmController,
-                decoration: InputDecoration(
-                  labelText: 'Confirme sua senha *',
-                ),
-                style: TextStyle(
-                  fontSize: 24.0,
-                ),
-                keyboardType: TextInputType.number,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: SizedBox(
-                width: double.maxFinite,
-                child: ElevatedButton(
-                  child: Text('Create'),
-                  style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(Color(0xFF133b3c))),
-                  onPressed: () {
-                    final String? name = _nameController.text;
-                    final String? cpf = _cpfController.text;
-                    final String? password = _passwordController.text;
-                    final String? confirmPassword =
-                        _passwordConfirmController.text;
-                    final String? email = _emailController.text;
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: SizedBox(
+                    width: double.maxFinite,
+                    child: ElevatedButton(
+                      child: Text('Create'),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                          Color(0xFF133b3c),
+                        ),
+                      ),
+                      onPressed: () async {
+                        final String? name = _nameController.text;
+                        final String? cpf = _cpfController.text
+                            .replaceAll('.', '')
+                            .replaceAll('-', '');
+                        final String? password = _passwordController.text;
+                        final String? confirmPassword =
+                            _passwordConfirmController.text;
+                        final String? email = _emailController.text;
 
-                    if (password != confirmPassword) {
-                      _showMyDialog(
-                        'Senhas não conferem.',
-                      );
-                      Navigator.pop(context);
-                    }
-                    final Onboarding onboardingCreated =
-                        Onboarding(name, cpf, password, '', email);
+                        if (password != confirmPassword) {
+                          await _showMyDialog(
+                            'Senhas não conferem.',
+                          );
+                          return Navigator.pop(context);
+                        }
+                        final Onboarding onboardingCreated =
+                            Onboarding(name, cpf, password, '', email);
 
-                    _webClient.save(onboardingCreated).then((onboardingResult) {
-                      _showMyDialog(onboardingResult.status as String);
-                      // if (onboardingResult.status == "Cadastrado com Sucesso") {
-                      //   _showMyDialog();
-                      // }
-                    });
-
-                    Navigator.pop(context);
-                    //final Contact newContact = Contact(0, name, accountNumber);
-                    //_dao.save(newContact).then((id) => Navigator.pop(context));
-                  },
-                ),
-              ),
-            )
-          ],
-        ),
+                        _webClient
+                            .save(onboardingCreated)
+                            .then((onboardingResult) {
+                          _showMyDialog(onboardingResult.status as String);
+                        });
+                      },
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -156,7 +166,11 @@ class _OnboardingFormState extends State<OnboardingForm> {
             TextButton(
               child: const Text('OK'),
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => Dashboard(),
+                  ),
+                );
               },
             ),
           ],

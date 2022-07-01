@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:onboarding_pdi/models/onboarding.dart';
+import 'package:onboarding_pdi/models/onboarding_result.dart';
 import 'package:onboarding_pdi/screens/onboarding_form.dart';
 
-class Dashboard extends StatelessWidget {
+class Dashboard extends StatefulWidget {
+  @override
+  _DashboardState createState() => _DashboardState();
+}
+
+class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,10 +28,10 @@ class Dashboard extends StatelessWidget {
             height: 180,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: InkWell(
-                onTap: () => showOnboardingForm(context),
-                child: Material(
-                  color: Color(0xFF133b3c), //Color.fromARGB(255, 47, 79, 79),
+              child: Material(
+                color: Color(0xFF133b3c), //Color.fromARGB(255, 47, 79, 79),
+                child: InkWell(
+                  onTap: () => showOnboardingForm(context),
                   child: Container(
                     padding: EdgeInsets.all(8.0),
                     width: 800,
@@ -58,10 +65,14 @@ class Dashboard extends StatelessWidget {
   }
 
   void showOnboardingForm(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => OnboardingForm(),
-      ),
-    );
+    Navigator.of(context)
+        .push(
+          MaterialPageRoute(
+            builder: (context) => OnboardingForm(),
+          ),
+        )
+        .then((value) => setState(
+              () {},
+            ));
   }
 }
